@@ -1,0 +1,32 @@
+# Fichiers de plan (exclus à la demande)
+PHASE1_DATA_ENGINEERING.md
+PLAN_PROJET_MEMOIRE.md
+
+# Données brutes (fichiers source sensibles)
+Extraction commande client 2021-2025.csv
+Extraction commande client 2021-2025.xlsx
+Extraction livraison client 2021-2025.csv
+Extraction livraison client 2021-2025.xlsx
+
+# Fichiers trop volumineux pour GitHub (>50MB)
+data/processed/dataset_step5.csv
+data/processed/dataset_step6.csv
+
+# Fichiers binaires parquet
+data/processed/*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+env/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
