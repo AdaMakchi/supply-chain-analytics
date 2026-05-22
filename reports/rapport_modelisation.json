@@ -1,0 +1,82 @@
+{
+  "date": "2026-05-21",
+  "cible": "qte_demandee",
+  "transformation_cible": "log1p (inverse: expm1, clip 0)",
+  "features": [
+    "prix",
+    "delai_demande_jours",
+    "code_client_freq",
+    "code_article_freq",
+    "est_jour_ferie_cmd",
+    "est_jour_ferie_liv_dem",
+    "pluie_mm_liv_dem",
+    "vent_max_kmh_liv_dem",
+    "temp_min_liv_dem",
+    "ipi_valeur",
+    "annee_cmd",
+    "mois_cmd",
+    "trimestre_cmd",
+    "semaine_cmd",
+    "jour_semaine_cmd",
+    "est_fin_mois_cmd",
+    "jour_semaine_liv_dem",
+    "statut_enc",
+    "devise_enc",
+    "pays_enc",
+    "famille_activite_client_enc",
+    "famille_activite_article_enc",
+    "segment_enc",
+    "type_activite_enc",
+    "est_weekend_liv_dem",
+    "est_vacances_scolaires_liv_dem",
+    "est_periode_peak_liv_dem",
+    "est_periode_covid"
+  ],
+  "split": {
+    "train": "2021-2023",
+    "val": "2024",
+    "test": "2025"
+  },
+  "baseline": {
+    "mae": 13.04,
+    "rmse": 145.11
+  },
+  "xgboost_log": {
+    "mae": 14.36,
+    "rmse": 153.11,
+    "r2": 0.2458,
+    "wape": 0.6536
+  },
+  "xgboost_tweedie": {
+    "mae": 13.74,
+    "rmse": 138.98,
+    "r2": 0.3785,
+    "wape": 0.6258
+  },
+  "lightgbm_log": {
+    "mae": 14.74,
+    "rmse": 158.43,
+    "r2": 0.1924,
+    "wape": 0.6712
+  },
+  "xgboost_optuna_final": {
+    "mae": 11.87,
+    "rmse": 132.17,
+    "r2": 0.438,
+    "wape": 0.5405,
+    "best_params": {
+      "n_estimators": 498,
+      "max_depth": 10,
+      "learning_rate": 0.07756845964350612,
+      "subsample": 0.9599800688780815,
+      "colsample_bytree": 0.7292867389417242,
+      "min_child_weight": 3,
+      "reg_alpha": 0.020696166075267128,
+      "reg_lambda": 0.2836301274074208
+    }
+  },
+  "lstm_time_to_event": {
+    "mae_jours": 24.5,
+    "precision_7j": 0.2554
+  }
+}
