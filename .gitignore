@@ -4,6 +4,7 @@ PLAN_PROJET_MEMOIRE.md
 PHASE2_ETUDES_STATS.md
 PHASE3_MODELISATION.md
 PHASE4_DASHBOARD.md
+SPRINT_A_PLAN.md
 
 # Données brutes (fichiers source sensibles)
 Extraction commande client 2021-2025.csv
@@ -33,6 +34,14 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Artefacts locaux
+.claude/
+.coverage
+logs/
+
+# Modèles trop volumineux pour GitHub (>100MB)
+models/xgboost_optuna_v2.pkl
 
 
 #gitignore

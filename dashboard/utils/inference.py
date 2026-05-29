@@ -14,6 +14,7 @@ import streamlit as st
 
 from dashboard.utils.features import (  # re-export pour rétro-compat
     FEATURES,
+    FEATURES_V2,
     FEATURES_LSTM,
     SEQ_LEN,
     TARGET_QTE,
@@ -21,12 +22,17 @@ from dashboard.utils.features import (  # re-export pour rétro-compat
 
 __all__ = [
     "FEATURES",
+    "FEATURES_V2",
     "FEATURES_LSTM",
     "SEQ_LEN",
     "TARGET_QTE",
     "load_xgb_optuna",
+    "load_xgb_optuna_v2",
     "load_lstm",
+    "load_lgbm_quantile",
     "predict_qte",
+    "predict_qte_v2",
+    "predict_qte_intervals",
     "predict_date_offset",
 ]
 
@@ -37,6 +43,22 @@ MODELS_DIR = ROOT / "models"
 @st.cache_resource
 def load_xgb_optuna():
     return joblib.load(MODELS_DIR / "xgboost_optuna_final.pkl")
+
+
+@st.cache_resource
+def load_xgb_optuna_v2():
+    return joblib.load(MODELS_DIR / "xgboost_optuna_v2.pkl")
+
+
+@st.cache_resource
+def load_lgbm_quantile() -> dict:
+    """Charge les 3 modeles quantile (P10, P50, P90). Retourne un dict ou None si absent."""
+    quantiles = {}
+    for q in ("p10", "p50", "p90"):
+        path = MODELS_DIR / f"lgbm_quantile_{q}.pkl"
+        if path.exists():
+            quantiles[q] = joblib.load(path)
+    return quantiles if len(quantiles) == 3 else None
 
 
 def _build_lstm_model(input_size: int):
@@ -78,6 +100,31 @@ def predict_qte(df: pd.DataFrame) -> np.ndarray:
     model = load_xgb_optuna()
     y_log = model.predict(df[FEATURES])
     return np.clip(np.expm1(y_log), 0, None)
+
+
+def predict_qte_v2(df: pd.DataFrame) -> np.ndarray:
+    """Predit qte_demandee a partir d'un DataFrame contenant les 47 FEATURES_V2."""
+    missing = [f for f in FEATURES_V2 if f not in df.columns]
+    if missing:
+        raise ValueError(f"Features V2 manquantes : {missing}")
+    model = load_xgb_optuna_v2()
+    y_log = model.predict(df[FEATURES_V2])
+    return np.clip(np.expm1(y_log), 0, None)
+
+
+def predict_qte_intervals(df: pd.DataFrame) -> dict:
+    """Retourne dict {p10, p50, p90} si modeles LGBM quantile dispo, sinon None."""
+    models = load_lgbm_quantile()
+    if models is None:
+        return None
+    missing = [f for f in FEATURES_V2 if f not in df.columns]
+    if missing:
+        raise ValueError(f"Features V2 manquantes : {missing}")
+    out = {}
+    for q, model in models.items():
+        y_log = model.predict(df[FEATURES_V2])
+        out[q] = np.clip(np.expm1(y_log), 0, None)
+    return out
 
 
 def predict_date_offset(sequences: np.ndarray) -> np.ndarray:

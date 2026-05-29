@@ -1,0 +1,37 @@
+{
+  "n_articles_strategiques": 22,
+  "comparison_mae": [
+    {
+      "modele": "IA (XGB v2)",
+      "MAE": 260.1088562011719,
+      "Biais": -223.01954908563633
+    },
+    {
+      "modele": "DDMRP",
+      "MAE": 660.7518984287319,
+      "Biais": -179.0412721661055
+    },
+    {
+      "modele": "Hybride 50/50",
+      "MAE": 242.03938700681744,
+      "Biais": -20.917760332096837
+    }
+  ],
+  "comparison_cout": [
+    {
+      "modele": "IA",
+      "cout_total": 18359.20596551895
+    },
+    {
+      "modele": "DDMRP",
+      "cout_total": 21023327.73222222
+    },
+    {
+      "modele": "Hybride",
+      "cout_total": 6617644.601842115
+    }
+  ],
+  "taux_rupture_ddmrp": 0.11212121212121212,
+  "alpha": 50.0,
+  "beta": 1.0
+}

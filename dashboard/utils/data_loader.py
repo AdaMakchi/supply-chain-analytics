@@ -20,6 +20,29 @@ def load_split(name: str) -> pd.DataFrame:
 
 
 @st.cache_data(ttl=3600)
+def load_split_v3(name: str) -> pd.DataFrame:
+    """Splits v3 (47 features V2 + colonnes meta). name in {'train', 'val', 'test'}."""
+    path = PROCESSED / f"split_{name}_v3_features.parquet"
+    return pd.read_parquet(path)
+
+
+@st.cache_data(ttl=3600)
+def load_backtest_2025() -> pd.DataFrame | None:
+    path = PROCESSED / "backtest_2025.parquet"
+    if path.exists():
+        return pd.read_parquet(path)
+    return None
+
+
+@st.cache_data(ttl=3600)
+def load_stock_mock() -> pd.DataFrame | None:
+    path = PROCESSED / "stock_mock.parquet"
+    if path.exists():
+        return pd.read_parquet(path)
+    return None
+
+
+@st.cache_data(ttl=3600)
 def load_enrichi() -> pd.DataFrame:
     return pd.read_parquet(PROCESSED / "dataset_ml_enrichi.parquet")
 

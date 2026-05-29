@@ -38,6 +38,28 @@ FEATURES: list[str] = [
 
 TARGET_QTE = "qte_demandee"
 
+FEATURES_V2: list[str] = FEATURES + [
+    "qte_lag_1",
+    "qte_lag_7",
+    "qte_lag_30",
+    "qte_roll_mean_7",
+    "qte_roll_mean_30",
+    "qte_roll_mean_90",
+    "qte_roll_std_30",
+    "qte_roll_mean_30_client",
+    "qte_roll_std_30_client",
+    "qte_roll_mean_30_article",
+    "qte_roll_std_30_article",
+    "nb_cmd_30j_couple",
+    "nb_jours_depuis_derniere_cmd",
+    "prix_lag_1",
+    "prix_delta_pct",
+    "cumul_qte_annee",
+    "te_couple",
+    "te_client",
+    "te_article",
+]
+
 FEATURES_LSTM: list[str] = [
     "mois_cmd",
     "trimestre_cmd",

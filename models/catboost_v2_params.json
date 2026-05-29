@@ -1,0 +1,13 @@
+{
+  "best_val_mae": 8.611330311035728,
+  "best_params": {
+    "iterations": 705,
+    "depth": 9,
+    "learning_rate": 0.034480628100521264,
+    "l2_leaf_reg": 0.04424137692640375,
+    "bagging_temperature": 0.6896744252117673,
+    "random_strength": 0.033168887516857926,
+    "min_data_in_leaf": 74
+  },
+  "n_trials": 30
+}

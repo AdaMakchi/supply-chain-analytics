@@ -19,19 +19,19 @@ if str(ROOT) not in sys.path:
 
 from dashboard.components.confidence_badge import badge  # noqa: E402
 from dashboard.utils.confidence import confidence_level  # noqa: E402
-from dashboard.utils.data_loader import historical_stats, load_split  # noqa: E402
+from dashboard.utils.data_loader import historical_stats, load_split_v3  # noqa: E402
 from dashboard.utils.features import TARGET_QTE  # noqa: E402
-from dashboard.utils.inference import predict_qte  # noqa: E402
+from dashboard.utils.inference import predict_qte_v2  # noqa: E402
 
 st.set_page_config(page_title="Prévisions — GE", page_icon="📈", layout="wide")
 st.title("📈 Prévisions de ventes")
-st.caption("Quantité demandée + date probable, avec score de confiance composite.")
+st.caption("Quantité demandée (XGBoost v2 — 47 features) avec score de confiance composite.")
 
 st.divider()
 
 # ----------------------------- Chargement -----------------------------------
-df_train = load_split("train")
-df_test = load_split("test")
+df_train = load_split_v3("train")
+df_test = load_split_v3("test")
 hist = historical_stats(df_train)
 
 # ----------------------------- Filtres --------------------------------------
@@ -58,8 +58,8 @@ if df_filtered.empty:
     st.stop()
 
 # ----------------------------- Prévision ------------------------------------
-st.subheader(f"Prévisions ({len(df_filtered)} lignes)")
-preds = predict_qte(df_filtered)
+st.subheader(f"Prévisions ({len(df_filtered)} lignes) — XGBoost v2")
+preds = predict_qte_v2(df_filtered)
 df_filtered["qte_predite"] = preds.round(2)
 
 # Confiance
@@ -118,3 +118,83 @@ st.download_button(
     file_name="previsions.csv",
     mime="text/csv",
 )
+
+st.divider()
+
+# ----------------------------- What-If Simulation ---------------------------
+st.subheader("🔬 Simulation what-if (modèle v2)")
+st.caption(
+    "Sélectionnez une ligne du dataset test et modifiez les features pour observer "
+    "l'effet sur la prédiction. Modèle XGBoost v2 (47 features) + intervalle quantile P10–P90."
+)
+
+try:
+    from dashboard.utils.data_loader import load_split_v3
+    from dashboard.utils.features import FEATURES_V2
+    from dashboard.utils.whatif import simulate_prediction
+
+    df_test_v3 = load_split_v3("test")
+    sample_size = min(500, len(df_test_v3))
+    sample_v3 = df_test_v3.sample(n=sample_size, random_state=42).reset_index(drop=True)
+
+    sel_idx = st.number_input(
+        "Index de la ligne (0 à {})".format(sample_size - 1),
+        min_value=0,
+        max_value=sample_size - 1,
+        value=0,
+        step=1,
+    )
+    row = sample_v3.iloc[int(sel_idx)]
+
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        prix_factor = st.slider("Prix (× facteur)", 0.5, 1.5, 1.0, 0.05)
+    with col_b:
+        delai = st.slider(
+            "Délai demandé (jours)",
+            0, 30, int(row["delai_demande_jours"]),
+        )
+    with col_c:
+        ipi_factor = st.slider("IPI (× facteur)", 0.9, 1.1, 1.0, 0.01)
+
+    col_d, col_e = st.columns(2)
+    with col_d:
+        peak_toggle = st.toggle("Période peak", value=bool(row.get("est_periode_peak_liv_dem", 0)))
+    with col_e:
+        ferie_toggle = st.toggle("Jour férié livraison", value=bool(row.get("est_jour_ferie_liv_dem", 0)))
+
+    overrides = {
+        "prix": float(row["prix"]) * prix_factor,
+        "delai_demande_jours": float(delai),
+        "ipi_valeur": float(row["ipi_valeur"]) * ipi_factor,
+        "est_periode_peak_liv_dem": int(peak_toggle),
+        "est_jour_ferie_liv_dem": int(ferie_toggle),
+    }
+
+    result = simulate_prediction(row, overrides)
+
+    col_x, col_y, col_z = st.columns(3)
+    col_x.metric("Prédiction actuelle", f"{result['pred_actuelle']:.2f}")
+    col_y.metric(
+        "Prédiction simulée",
+        f"{result['pred_simulee']:.2f}",
+        delta=f"{result['delta_pct']:+.1f}%",
+    )
+    if result["p10"] is not None:
+        col_z.metric(
+            "Intervalle P10 – P90",
+            f"{result['p10']:.1f} – {result['p90']:.1f}",
+        )
+    else:
+        col_z.info("Intervalle indisponible (modèle quantile absent)")
+
+    with st.expander("Voir features modifiées"):
+        diff_df = pd.DataFrame({
+            "feature": list(overrides.keys()),
+            "valeur_initiale": [row[k] for k in overrides],
+            "valeur_simulee": list(overrides.values()),
+        })
+        st.dataframe(diff_df, use_container_width=True, hide_index=True)
+
+except Exception as exc:
+    st.warning(f"Simulation what-if indisponible : {exc}")
