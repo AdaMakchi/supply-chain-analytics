@@ -1201,7 +1201,7 @@ story += [
       "explicitement documente dans la limite opérationnelle pour le MVP - un Mode B "
       "(encodage automatique cote serveur) est positionne en perspective.", S_PN),
 
-    screen("données.png",
+    screen("donnees.png",
            "Figure 11 - Page Gestion des Données du dashboard. Le tableau filtrable consulte "
            "l'historique 2021-2025 ; le bandeau d'import en haut accepte les CSV Mode A."),
 
@@ -1237,19 +1237,19 @@ story += [
       "<i>Analyse</i> via un slider, materialisant la matrice de gouvernance HITL "
       "(détaillée section 3.4).", S_PN),
 
-    screen("prévisions.png",
+    screen("previsions.png",
            "Figure 13 - Page Prévisions de Ventes (vue principale). Tableau central : un "
            "couple client-article par ligne, colonnes Quantité predite, P10-P90, Confiance "
            "(badge couleur), Action recommandée. Le panneau de filtres lateral autorise une "
            "sélection multidimensionnelle."),
 
-    screen("prévisions 1.png",
+    screen("previsions 1.png",
            "Figure 14 - Page Prévisions, sous-section <i>Prédiction vs valeur réelle</i>. "
            "Scatter plot interactif Plotly : abscisse valeur réelle, ordonnee prédiction. "
            "La couleur encode le score de confiance et la diagonale grise materialise la "
            "prédiction parfaite."),
 
-    screen("prévisions 2.png",
+    screen("previsions 2.png",
            "Figure 15 - Page Prévisions, sous-section <i>Simulation what-if</i>. Sliders et "
            "toggles permettant au planificateur de simuler l'effet d'une variation de prix, "
            "de delai, d'IPI ou d'un passage en jour férié sur la prédiction d'une ligne "
